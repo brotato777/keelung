@@ -1,0 +1,25 @@
+# Git
+.git
+.gitignore
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Backend (Maven)
+keelungapi/target/
+keelungapi/.mvn/
+keelungapi/mvnw
+keelungapi/mvnw.cmd
+
+# Frontend (Node.js)
+keelung-sights-frontend/node_modules/
+keelung-sights-frontend/dist/
