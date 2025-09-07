@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:8080/SightAPI/db?zone=";
+//const API_BASE = "http://localhost:8080/SightAPI/db?zone=";
+const API_BASE = "http://keelung-production-7cdf.up.railway.app/SightAPI/db?zone=";
 const ZONES = ["中山", "信義", "仁愛", "中正", "安樂", "七堵", "暖暖"];
 
 function Modal({ isOpen, onClose, children }) {
