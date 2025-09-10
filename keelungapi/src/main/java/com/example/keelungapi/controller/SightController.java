@@ -40,7 +40,6 @@ public class SightController {
     public void initializeDatabase() {
         logger.info("應用程式啟動，開始自動爬取所有景點資料...");
         try {
-            // 檢查資料庫是否為空
             if (sightRepository.count() > 0) {
                 logger.info("資料庫中已有資料，跳過初始化");
                 return;
@@ -81,16 +80,6 @@ public class SightController {
         return List.of(sights);
     }
 
-    @GetMapping("/SightAPI/old")
-    public List<Sight> getSights(@RequestParam String zone) {
-        Sight[] sights = crawler.getItems(zone);
-        logger.info("zone={}, sights={}", zone, java.util.Arrays.toString(sights));
-        if (sights.length == 0) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "查無資料");
-        }
-        return List.of(sights);
-    }
-
     @GetMapping("/SightAPI/db")
     public List<Sight> getSightsFromDB(@RequestParam String zone) {
         logger.info("從資料庫查詢 {} 區的景點", zone);
@@ -101,7 +90,6 @@ public class SightController {
     public ResponseEntity<String> crawlAllSights() {
         try {
             int totalSights = 0;
-            // 先清空现有数据
             sightRepository.deleteAll();
 
             for (String zone : ZONES) {
@@ -109,7 +97,7 @@ public class SightController {
                     Sight[] sights = crawler.getItems(zone);
                     for (Sight sight : sights) {
                         try {
-                            sight.setId(null);  // 确保创建新记录
+                            sight.setId(null);
                             sightRepository.insert(sight);
                             totalSights++;
                             logger.info("成功保存景點: {}", sight.getSightName());
