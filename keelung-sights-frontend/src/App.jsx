@@ -37,7 +37,8 @@ function SightsList() {
     }, [selectedZone]);
 
     return (
-        <div className="min-h-screen w-full px-4 py-8">
+        <div className="min-h-screen w-full flex justify-center">
+            <div className="w-full px-4 py-8">
                 <h1 className="text-4xl font-bold text-center mb-8 text-white">基隆景點導覽</h1>
                 <div className="mb-8 flex flex-wrap justify-center items-center gap-2">
                     {ZONES.map((zone) => (
@@ -93,6 +94,7 @@ function SightsList() {
                         ))
                     )}
                 </div>
+            </div>
 
             <Modal
                 isOpen={!!selectedSight}
