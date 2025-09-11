@@ -1,5 +1,6 @@
 package com.example.keelungapi.service;
 
+import com.example.keelungapi.crawler.KeelungSightsCrawler;
 import com.example.keelungapi.models.Sight;
 import com.example.keelungapi.repository.SightRepository;
 import org.springframework.stereotype.Service;
@@ -12,10 +13,13 @@ import java.util.List;
 @Service
 public class SightService {
     private final SightRepository sightRepository;
+    private final KeelungSightsCrawler crawler;
     private static final Logger logger = LoggerFactory.getLogger(SightService.class);
+    private static final String[] ZONES = {"中正", "仁愛", "信義", "中山", "安樂", "暖暖", "七堵"};
 
-    public SightService(SightRepository sightRepository) {
+    public SightService(SightRepository sightRepository, KeelungSightsCrawler crawler) {
         this.sightRepository = sightRepository;
+        this.crawler = crawler;
     }
 
     public List<Sight> getSightsByZone(String zone) {
@@ -34,5 +38,29 @@ public class SightService {
 
         logger.info("從資料庫查詢到 {} 個景點 ({})", sights.size(), zone);
         return sights;
+    }
+
+    public void initializeDatabase() {
+        sightRepository.deleteAll();
+        logger.info("已清空資料庫舊有景點資料");
+
+        logger.info("應用程式啟動，開始自動爬取所有景點資料...");
+
+        for (String zone : ZONES) {
+            try {
+                Sight[] sights = crawler.getItems(zone);
+
+                for (Sight sight : sights) {
+                    sight.setId(null);
+                    sightRepository.save(sight);
+                }
+
+                logger.info("完成 {} 區的爬取並保存，共 {} 個景點", zone, sights.length);
+            } catch (Exception e) {
+                logger.error("初始化爬取 {} 區景點時發生錯誤: {}", zone, e.getMessage());
+            }
+        }
+
+        logger.info("初始化完成");
     }
 }
