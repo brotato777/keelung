@@ -38,6 +38,9 @@ public class SightController {
 
     @PostConstruct
     public void initializeDatabase() {
+        sightRepository.deleteAll();
+        logger.info("已清空資料庫舊有景點資料");
+
         logger.info("應用程式啟動，開始自動爬取所有景點資料...");
 
         for (String zone : ZONES) {
