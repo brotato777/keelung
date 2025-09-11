@@ -4,11 +4,15 @@ import com.example.keelungapi.crawler.KeelungSightsCrawler;
 import com.example.keelungapi.models.Sight;
 import com.example.keelungapi.repository.SightRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.List;
+
 
 @Service
 public class SightService {
@@ -40,11 +44,10 @@ public class SightService {
         return sights;
     }
 
-    public void initializeDatabase() {
+    public void crawlAllSights() {
         sightRepository.deleteAll();
         logger.info("已清空資料庫舊有景點資料");
-
-        logger.info("應用程式啟動，開始自動爬取所有景點資料...");
+        logger.info("開始爬取所有景點資料");
 
         for (String zone : ZONES) {
             try {
@@ -53,6 +56,7 @@ public class SightService {
                 for (Sight sight : sights) {
                     sight.setId(null);
                     sightRepository.save(sight);
+                    logger.info("已保存景點: {} ({})", sight.getSightName(), zone);
                 }
 
                 logger.info("完成 {} 區的爬取並保存，共 {} 個景點", zone, sights.length);
@@ -60,7 +64,14 @@ public class SightService {
                 logger.error("初始化爬取 {} 區景點時發生錯誤: {}", zone, e.getMessage());
             }
         }
+    }
 
-        logger.info("初始化完成");
+    public List<Sight> getSightsByWeb(@RequestParam String zone) {
+        Sight[] sights = crawler.getItems(zone);
+        logger.info("從網站爬取資料 zone={}, sights={}", zone, java.util.Arrays.toString(sights));
+        if (sights.length == 0) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "查無資料");
+        }
+        return List.of(sights);
     }
 }
